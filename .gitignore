@@ -1,0 +1,21 @@
+# User-specific configuration (never share)
+*.local.md
+
+# User memory files (never share)
+/memory/
+/WorkMemory/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
