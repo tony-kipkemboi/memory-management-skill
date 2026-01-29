@@ -296,6 +296,52 @@ Found 15 files modified in the last 7 days
 
 ---
 
+---
+
+### `/mem-delete` - Delete All Memory
+
+**⚠️ DANGEROUS** - Permanently delete all your work memory data.
+
+**Usage:**
+```
+/mem-delete
+```
+
+**Safety Features:**
+- Requires **double confirmation** via interactive prompts
+- Shows exactly what will be deleted before asking
+- Cannot be undone - no recovery possible
+
+**Example Flow:**
+```
+User: /mem-delete
+
+Claude: "📊 Data that will be PERMANENTLY DELETED:
+         - 12 people profiles
+         - 5 projects
+         - 3 teams
+         - All interaction logs"
+
+Claude: [First Confirmation]
+        "⚠️ Are you sure you want to DELETE ALL your work memory?"
+        → Yes, delete everything
+        → No, cancel
+
+User: [Selects Yes]
+
+Claude: [Second Confirmation]
+        "🚨 FINAL WARNING: This will permanently erase all data."
+        → DELETE - I understand this is permanent
+        → Cancel - I changed my mind
+
+User: [Selects DELETE]
+
+Claude: "✅ All memory data has been permanently deleted.
+         To start fresh: use memory management"
+```
+
+---
+
 ## Command Summary
 
 | Command | Purpose | Arguments |
@@ -306,6 +352,7 @@ Found 15 files modified in the last 7 days
 | `/mem-stats` | Show statistics | None |
 | `/mem-browse` | Open in file browser | None |
 | `/mem-recent` | Show recent activity | `[days]` (default: 7) |
+| `/mem-delete` | **Delete all memory** | None (requires double confirmation) |
 
 ---
 

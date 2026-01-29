@@ -71,32 +71,67 @@ Options:
 3. "Custom location" - "Specify your own path - for users who want a specific location"
 ```
 
-**Step 3: After user answers, run the init script with their choice:**
+**Step 3: After user answers, run the init script with their choice (use -q for quiet mode):**
 
-Based on user's answer, run:
+Based on user's answer, run with `-q` flag for minimal output:
 ```bash
 SKILL_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/memory-management}"
 
 # For Documents folder (option 1):
-bash "$SKILL_DIR/scripts/init-memory.sh" 1
+bash "$SKILL_DIR/scripts/init-memory.sh" 1 -q
 
 # For Desktop (option 2):
-bash "$SKILL_DIR/scripts/init-memory.sh" 2
+bash "$SKILL_DIR/scripts/init-memory.sh" 2 -q
 
 # For Custom location (option 3) - also pass the custom path:
-bash "$SKILL_DIR/scripts/init-memory.sh" 3 "/path/user/provided"
+bash "$SKILL_DIR/scripts/init-memory.sh" 3 "/path/user/provided" -q
 ```
 
-**Step 4: Verify setup completed:**
-```bash
-CONFIG_FILE="$HOME/.claude/skills/memory-management/memory-management.local.md"
-if [ -f "$CONFIG_FILE" ]; then
-    MEMORY_ROOT=$(grep "^memory_root:" "$CONFIG_FILE" | cut -d' ' -f2-)
-    echo "✅ Setup complete! Memory location: $MEMORY_ROOT"
-else
-    echo "❌ Setup failed"
-fi
+The `-q` flag produces minimal output:
 ```
+✅ SETUP_COMPLETE
+MEMORY_ROOT=/Users/tony/Documents/WorkMemory
+ORG=Guild
+TIMEZONE=PST
+```
+
+**Step 4: Present the setup summary to user (Claude should format nicely):**
+
+After the script completes, present a friendly summary to the user including:
+
+1. **Memory Location** - Show the full path
+2. **Folders Created** - List what was set up (me/, people/, projects/, teams/, topics/, logs/, config/)
+3. **Quick Commands Available:**
+   ```
+   /mem-list    - List all people, projects, teams
+   /mem-view    - View a specific profile
+   /mem-search  - Search across all memory
+   /mem-stats   - Show memory statistics
+   /mem-browse  - Open folder in Finder
+   /mem-recent  - Show recent activity
+   /mem-delete  - Delete all memory (with confirmation)
+   ```
+4. **What You Can Do Now** - Example commands to try
+
+**Step 5: Offer to create user's own profile:**
+
+After setup is complete, use AskUserQuestion to ask:
+```
+Question: "Would you like to set up your work profile now? This helps me understand your role and preferences."
+Header: "Your Profile"
+Options:
+1. "Yes, let's do it" - "I'll ask a few questions about your role, team, and work preferences"
+2. "Skip for now" - "You can always do this later by saying 'Create my profile'"
+```
+
+If user chooses "Yes", use AskUserQuestion to gather:
+- Their name
+- Their role/title
+- Their team/department
+- Communication preferences (Slack, email, etc.)
+- Work hours (optional)
+
+Then create/update the files in the `me/` folder.
 
 ## Memory Structure
 

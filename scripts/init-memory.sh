@@ -2,8 +2,22 @@
 # init-memory.sh
 # First-run initialization for Memory Management System
 # Guild-specific configuration
+#
+# Usage:
+#   Interactive:     ./init-memory.sh
+#   Non-interactive: ./init-memory.sh <choice> [custom_path] [-q]
+#     choice: 1=Documents, 2=Desktop, 3=Custom
+#     -q: Quiet mode (minimal output for Claude)
 
 set -e
+
+# Check for quiet mode flag
+QUIET_MODE=false
+for arg in "$@"; do
+    if [ "$arg" = "-q" ]; then
+        QUIET_MODE=true
+    fi
+done
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -16,21 +30,24 @@ NC='\033[0m' # No Color
 SKILL_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/memory-management}"
 CONFIG_FILE="$SKILL_DIR/memory-management.local.md"
 
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}  Memory Management System - First-Time Setup${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo "Welcome to the Memory Management System for Guild!"
-echo ""
-echo "This one-time setup will:"
-echo "  • Choose where to store your work memory"
-echo "  • Create the folder structure"
-echo "  • Set up templates and configuration"
-echo ""
-echo "Your memory will only be stored on YOUR machine."
-echo "It will never be shared unless you explicitly choose to."
-echo ""
+# Only show verbose output in non-quiet mode
+if [ "$QUIET_MODE" = false ]; then
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  Memory Management System - First-Time Setup${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo "Welcome to the Memory Management System for Guild!"
+    echo ""
+    echo "This one-time setup will:"
+    echo "  • Choose where to store your work memory"
+    echo "  • Create the folder structure"
+    echo "  • Set up templates and configuration"
+    echo ""
+    echo "Your memory will only be stored on YOUR machine."
+    echo "It will never be shared unless you explicitly choose to."
+    echo ""
+fi
 
 # Function to set location based on choice
 set_location() {
@@ -466,80 +483,89 @@ Built with ❤️  for Guilders by Tony Kipkemboi
 EOF
 
 # Success!
-echo ""
-echo -e "${GREEN}✅ Memory System Setup Complete!${NC}"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}  Setup Summary${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${GREEN}📁 MEMORY LOCATION${NC}"
-echo "   $FULL_PATH"
-echo ""
-echo -e "${GREEN}🏢 ORGANIZATION${NC}"
-echo "   Guild"
-echo ""
-echo -e "${GREEN}🕐 TIMEZONE${NC}"
-echo "   $TIMEZONE"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${GREEN}📂 FOLDERS CREATED${NC}"
-echo ""
-echo "   ✓ me/                  Your work profile and preferences"
-echo "   ✓ people/              Colleagues and professional contacts"
-echo "   ✓ projects/            Active projects and initiatives"
-echo "   ✓ teams/               Team structures and context"
-echo "   ✓ topics/              Knowledge areas and expertise"
-echo "   ✓ logs/                Activity logs and history"
-echo "   ✓ config/              System configuration and templates"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${GREEN}🚀 WHAT YOU CAN DO NOW${NC}"
-echo ""
-echo "   1. Start logging work interactions:"
-echo "      → \"Log my conversation with Sarah about Q1 roadmap\""
-echo ""
-echo "   2. Build colleague profiles:"
-echo "      → \"Create a profile for John Doe in Engineering\""
-echo ""
-echo "   3. Track projects:"
-echo "      → \"Add a project called 'Infrastructure Migration'\""
-echo ""
-echo "   4. Get daily briefings:"
-echo "      → \"Give me my morning work briefing\""
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${GREEN}📖 LEARN MORE${NC}"
-echo ""
-echo "   View your memory folder:"
+if [ "$QUIET_MODE" = true ]; then
+    # Minimal output for Claude
+    echo "✅ SETUP_COMPLETE"
+    echo "MEMORY_ROOT=$FULL_PATH"
+    echo "ORG=Guild"
+    echo "TIMEZONE=$TIMEZONE"
+else
+    # Verbose output for interactive mode
+    echo ""
+    echo -e "${GREEN}✅ Memory System Setup Complete!${NC}"
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  Setup Summary${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${GREEN}📁 MEMORY LOCATION${NC}"
+    echo "   $FULL_PATH"
+    echo ""
+    echo -e "${GREEN}🏢 ORGANIZATION${NC}"
+    echo "   Guild"
+    echo ""
+    echo -e "${GREEN}🕐 TIMEZONE${NC}"
+    echo "   $TIMEZONE"
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${GREEN}📂 FOLDERS CREATED${NC}"
+    echo ""
+    echo "   ✓ me/                  Your work profile and preferences"
+    echo "   ✓ people/              Colleagues and professional contacts"
+    echo "   ✓ projects/            Active projects and initiatives"
+    echo "   ✓ teams/               Team structures and context"
+    echo "   ✓ topics/              Knowledge areas and expertise"
+    echo "   ✓ logs/                Activity logs and history"
+    echo "   ✓ config/              System configuration and templates"
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${GREEN}🚀 WHAT YOU CAN DO NOW${NC}"
+    echo ""
+    echo "   1. Start logging work interactions:"
+    echo "      → \"Log my conversation with Sarah about Q1 roadmap\""
+    echo ""
+    echo "   2. Build colleague profiles:"
+    echo "      → \"Create a profile for John Doe in Engineering\""
+    echo ""
+    echo "   3. Track projects:"
+    echo "      → \"Add a project called 'Infrastructure Migration'\""
+    echo ""
+    echo "   4. Get daily briefings:"
+    echo "      → \"Give me my morning work briefing\""
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${GREEN}📖 LEARN MORE${NC}"
+    echo ""
+    echo "   View your memory folder:"
 
-# Check OS for open command
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "   → open $FULL_PATH"
-    # Only prompt to open in interactive mode
-    if [ -z "$1" ]; then
-        echo ""
-        read -p "   Would you like to open it now? (y/n): " open_now
-        if [[ $open_now =~ ^[Yy]$ ]]; then
-            open "$FULL_PATH"
-            echo "   ✓ Opened in Finder"
+    # Check OS for open command
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "   → open $FULL_PATH"
+        # Only prompt to open in interactive mode (no args)
+        if [ -z "$1" ]; then
+            echo ""
+            read -p "   Would you like to open it now? (y/n): " open_now
+            if [[ $open_now =~ ^[Yy]$ ]]; then
+                open "$FULL_PATH"
+                echo "   ✓ Opened in Finder"
+            fi
         fi
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "   → xdg-open $FULL_PATH"
+    elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        echo "   → explorer $FULL_PATH"
     fi
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo "   → xdg-open $FULL_PATH"
-elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-    echo "   → explorer $FULL_PATH"
-fi
 
-echo ""
-echo "   Read the guide:"
-echo "   → $FULL_PATH/config/README.md"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
+    echo ""
+    echo "   Read the guide:"
+    echo "   → $FULL_PATH/config/README.md"
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+fi
 echo -e "${BLUE}💾 Your settings are saved at:${NC}"
 echo "   ~/.claude/skills/memory-management.local.md"
 echo ""
