@@ -41,27 +41,60 @@ You are a **Memory Management Specialist** for Guild employees. Your role is to 
 
 ## First-Run Setup
 
-**Check if configured:**
+**IMPORTANT: Always check if configured first before doing anything else!**
+
+**Step 1: Check if already configured:**
 ```bash
 SKILL_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/memory-management}"
 CONFIG_FILE="$SKILL_DIR/memory-management.local.md"
 
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "🚀 First time using Memory Management! Let's set you up..."
-    bash "$SKILL_DIR/scripts/init-memory.sh"
-    exit 0
+if [ -f "$CONFIG_FILE" ]; then
+    echo "✅ Memory system configured"
+    MEMORY_ROOT=$(grep "^memory_root:" "$CONFIG_FILE" | cut -d' ' -f2-)
+    echo "Location: $MEMORY_ROOT"
+else
+    echo "⚠️Not configured yet - needs first-time setup"
 fi
 ```
 
-If configuration exists, read the memory root:
-```bash
-# Read memory_root from YAML frontmatter
-MEMORY_ROOT=$(grep "^memory_root:" "$CONFIG_FILE" | cut -d' ' -f2)
+**Step 2: If NOT configured, use AskUserQuestion to get user's preference:**
 
-if [ -z "$MEMORY_ROOT" ] || [ ! -d "$MEMORY_ROOT" ]; then
-    echo "⚠️ Memory location not found. Re-initializing..."
-    bash "$SKILL_DIR/scripts/init-memory.sh"
-    exit 0
+When the config file doesn't exist, you MUST use the `AskUserQuestion` tool to ask the user where they want their memory stored. DO NOT run the bash script with interactive prompts.
+
+Use this question:
+```
+Question: "Where should I create your work memory folder? (This will store your professional context and relationships)"
+Header: "Location"
+Options:
+1. "Documents folder (Recommended)" - "Creates WorkMemory in your Documents folder - easy to find in Finder"
+2. "Desktop" - "Creates WorkMemory on your Desktop - always visible and easy to access"
+3. "Custom location" - "Specify your own path - for users who want a specific location"
+```
+
+**Step 3: After user answers, run the init script with their choice:**
+
+Based on user's answer, run:
+```bash
+SKILL_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/memory-management}"
+
+# For Documents folder (option 1):
+bash "$SKILL_DIR/scripts/init-memory.sh" 1
+
+# For Desktop (option 2):
+bash "$SKILL_DIR/scripts/init-memory.sh" 2
+
+# For Custom location (option 3) - also pass the custom path:
+bash "$SKILL_DIR/scripts/init-memory.sh" 3 "/path/user/provided"
+```
+
+**Step 4: Verify setup completed:**
+```bash
+CONFIG_FILE="$HOME/.claude/skills/memory-management/memory-management.local.md"
+if [ -f "$CONFIG_FILE" ]; then
+    MEMORY_ROOT=$(grep "^memory_root:" "$CONFIG_FILE" | cut -d' ' -f2-)
+    echo "✅ Setup complete! Memory location: $MEMORY_ROOT"
+else
+    echo "❌ Setup failed"
 fi
 ```
 

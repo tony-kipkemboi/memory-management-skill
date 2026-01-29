@@ -32,8 +32,49 @@ echo "Your memory will only be stored on YOUR machine."
 echo "It will never be shared unless you explicitly choose to."
 echo ""
 
-# Function to get user choice
-ask_location() {
+# Function to set location based on choice
+set_location() {
+    local choice="$1"
+    local custom_path="$2"
+
+    case $choice in
+        1)
+            MEMORY_ROOT="$HOME/Documents/WorkMemory"
+            LOCATION_DESC="Documents folder"
+            ;;
+        2)
+            MEMORY_ROOT="$HOME/Desktop/WorkMemory"
+            LOCATION_DESC="Desktop"
+            ;;
+        3)
+            if [ -n "$custom_path" ]; then
+                # Expand ~ if present
+                MEMORY_ROOT="${custom_path/#\~/$HOME}"
+                LOCATION_DESC="Custom location"
+            else
+                echo -e "${YELLOW}Custom path required for option 3. Using Documents folder.${NC}"
+                MEMORY_ROOT="$HOME/Documents/WorkMemory"
+                LOCATION_DESC="Documents folder (default)"
+            fi
+            ;;
+        *)
+            echo -e "${YELLOW}Invalid choice. Using Documents folder (default).${NC}"
+            MEMORY_ROOT="$HOME/Documents/WorkMemory"
+            LOCATION_DESC="Documents folder (default)"
+            ;;
+    esac
+}
+
+# Check for command-line arguments (non-interactive mode for Claude)
+# Usage: init-memory.sh [choice] [custom_path]
+#   choice: 1 = Documents, 2 = Desktop, 3 = Custom
+#   custom_path: required if choice is 3
+
+if [ -n "$1" ]; then
+    # Non-interactive mode - use provided arguments
+    set_location "$1" "$2"
+else
+    # Interactive mode - ask user
     echo -e "${YELLOW}Where should I create your work memory folder?${NC}"
     echo ""
     echo "1) Documents folder (Recommended)"
@@ -49,32 +90,14 @@ ask_location() {
     echo ""
     read -p "Enter your choice (1, 2, or 3): " choice
 
-    case $choice in
-        1)
-            MEMORY_ROOT="$HOME/Documents/WorkMemory"
-            LOCATION_DESC="Documents folder"
-            ;;
-        2)
-            MEMORY_ROOT="$HOME/Desktop/WorkMemory"
-            LOCATION_DESC="Desktop"
-            ;;
-        3)
-            echo ""
-            read -p "Enter the full path where you'd like to store your work memory: " custom_path
-            # Expand ~ if present
-            MEMORY_ROOT="${custom_path/#\~/$HOME}"
-            LOCATION_DESC="Custom location"
-            ;;
-        *)
-            echo -e "${YELLOW}Invalid choice. Using Documents folder (default).${NC}"
-            MEMORY_ROOT="$HOME/Documents/WorkMemory"
-            LOCATION_DESC="Documents folder (default)"
-            ;;
-    esac
-}
-
-# Get location preference
-ask_location
+    if [ "$choice" = "3" ]; then
+        echo ""
+        read -p "Enter the full path where you'd like to store your work memory: " custom_path
+        set_location "$choice" "$custom_path"
+    else
+        set_location "$choice"
+    fi
+fi
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -99,12 +122,15 @@ fi
 echo "🕐 Timezone: $TIMEZONE (auto-detected)"
 echo ""
 
-read -p "Does this look correct? (y/n): " confirm
+# Skip confirmation in non-interactive mode (when args provided)
+if [ -z "$1" ]; then
+    read -p "Does this look correct? (y/n): " confirm
 
-if [[ ! $confirm =~ ^[Yy]$ ]]; then
-    echo ""
-    echo "Setup cancelled. Run this script again to reconfigure."
-    exit 0
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "Setup cancelled. Run this script again to reconfigure."
+        exit 0
+    fi
 fi
 
 echo ""
@@ -493,11 +519,14 @@ echo "   View your memory folder:"
 # Check OS for open command
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "   → open $FULL_PATH"
-    echo ""
-    read -p "   Would you like to open it now? (y/n): " open_now
-    if [[ $open_now =~ ^[Yy]$ ]]; then
-        open "$FULL_PATH"
-        echo "   ✓ Opened in Finder"
+    # Only prompt to open in interactive mode
+    if [ -z "$1" ]; then
+        echo ""
+        read -p "   Would you like to open it now? (y/n): " open_now
+        if [[ $open_now =~ ^[Yy]$ ]]; then
+            open "$FULL_PATH"
+            echo "   ✓ Opened in Finder"
+        fi
     fi
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "   → xdg-open $FULL_PATH"
