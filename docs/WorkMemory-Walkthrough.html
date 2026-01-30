@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Work Memory System - Walkthrough</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #27ae60; }
+        code { 
+            background: #f4f4f4; 
+            padding: 2px 6px; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code { background: none; color: inherit; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding-left: 20px;
+            color: #666;
+        }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+        .toc { background: #f9f9f9; padding: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="content">
+<p><h1>Work Memory System</h1>
+<h2>Complete Walkthrough & User Guide</h2></p><p><strong>Version:</strong> 1.0
+<strong>Date:</strong> January 29, 2026
+<strong>Author:</strong> Tony Kipkemboi</p><p><hr></p><p><h2>Table of Contents</h2></p><p>1. <a href="#introduction">Introduction</a>
+2. <a href="#what-problem-does-this-solve">What Problem Does This Solve?</a>
+3. <a href="#system-overview">System Overview</a>
+4. <a href="#installation--setup">Installation & Setup</a>
+5. <a href="#how-it-works">How It Works</a>
+6. <a href="#meeting-capture-workflow">Meeting Capture Workflow</a>
+7. <a href="#people-profiles">People Profiles</a>
+8. <a href="#commands-reference">Commands Reference</a>
+9. <a href="#technical-details">Technical Details</a>
+10. <a href="#troubleshooting">Troubleshooting</a></p><p><hr></p><p><h2>Introduction</h2></p><p>Work Memory is a <strong>filesystem-based knowledge graph</strong> for tracking professional relationships, meetings, and work context. It integrates with <strong>Granola</strong> (a meeting transcription app) to automatically capture meeting notes and build profiles of the people you work with.</p><p><h3>Key Features</h3></p><p>- <strong>Automatic meeting capture</strong> - Syncs meeting transcripts from Granola
+- <strong>People profiles</strong> - Tracks internal colleagues and external contacts
+- <strong>Interaction history</strong> - Monthly logs of who you met with
+- <strong>Split meeting detection</strong> - Handles Granola's quirks automatically
+- <strong>Privacy-first</strong> - All data stays on your local machine</p><p><hr></p><p><h2>What Problem Does This Solve?</h2></p><p><h3>Before Work Memory</h3></p><p>- Meeting notes scattered across apps
+- Can't remember past conversations with colleagues
+- No context when preparing for follow-up meetings
+- External vendor contacts lost in email</p><p><h3>After Work Memory</h3></p><p>- All meetings logged in one place with transcripts
+- Know everyone you've met with and when
+- Prepare for meetings with full history
+- Build relationships over time with interaction tracking</p><p><hr></p><p><h2>System Overview</h2></p><p><pre><code>┌─────────────────────────────────────────────────────────┐
+│                    YOUR WORKFLOW                         │
+└─────────────────────────────────────────────────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+│ Google        │  │   Granola     │  │ Claude Code   │
+│ Calendar      │  │  (Recording)  │  │  (Interface)  │
+└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
+        │                  │                  │
+        │                  ▼                  │
+        │         ┌───────────────┐           │
+        └────────▶│ Work Memory   │◀──────────┘
+                  │ (Local Files) │
+                  └───────────────┘
+</code></pre></p><p><h3>Components</h3></p><p><table>
+<tr><th>Component</th><th>Purpose</th></tr>
+</table>
+| <strong>Granola</strong> | Records and transcribes meetings |
+| <strong>Watcher Service</strong> | Detects new transcripts automatically |
+| <strong>Processor</strong> | Handles quirks, extracts data |
+| <strong>Work Memory</strong> | Stores everything in markdown files |
+| <strong>Claude Code</strong> | Interface for queries and management |</p><p><hr></p><p><h2>Installation & Setup</h2></p><p><h3>Prerequisites</h3></p><p>- macOS
+- Granola app installed and configured
+- Claude Code CLI</p><p><h3>First-Time Setup</h3></p><p>When you first invoke the memory-management skill:</p><p>1. You'll be asked where to store your memory files
+2. Choose: <strong>Documents folder</strong> (recommended), Desktop, or Custom
+3. The system creates the folder structure automatically</p><p><h3>Directory Structure Created</h3></p><p><pre><code>~/Documents/WorkMemory/
+├── me/                    # Your profile
+├── people/
+│   ├── internal/          # Guild colleagues
+│   └── external/          # Outside contacts
+├── meetings/              # Meeting logs
+├── projects/              # Project tracking
+├── teams/                 # Team info
+├── topics/                # Knowledge areas
+├── logs/                  # Activity logs
+└── config/                # Configuration
+</code></pre></p><p><h3>Starting the Auto-Sync Service</h3></p><p>The LaunchAgent runs automatically on login:</p><p><pre><code><h1>Check if running</h1>
+<table>
+</table></p><p><h1>Start manually</h1>
+launchctl load ~/Library/LaunchAgents/com.workmemory.granola-sync.plist</p><p><h1>Stop</h1>
+launchctl unload ~/Library/LaunchAgents/com.workmemory.granola-sync.plist
+</code></pre></p><p><hr></p><p><h2>How It Works</h2></p><p><h3>Automatic Meeting Capture</h3></p><p><pre><code>1. You have a meeting (Zoom, Google Meet, etc.)
+          │
+          ▼
+2. Granola records and transcribes it
+          │
+          ▼
+3. Granola saves transcript to local cache
+          │
+          ▼
+4. Watcher detects new transcript (file change)
+          │
+          ▼
+5. Processor extracts:
+   - Meeting title & duration
+   - Attendees (from calendar + Granola)
+   - Full transcript text
+          │
+          ▼
+6. Creates in Work Memory:
+   - Meeting log file
+   - Person profiles (if new)
+   - Interaction log entries
+   - Activity log entry
+</code></pre></p><p><h3>Intelligent Detection</h3></p><p>The system handles several edge cases:</p><p><strong>Split Meetings:</strong> Sometimes Granola creates two documents for one meeting (e.g., if there's a connection issue). The system detects this by:
+- Checking if the second doc starts within 2 minutes of the first ending
+- Checking if the second doc has no calendar event
+- Automatically merging the transcripts</p><p><strong>Deduplication:</strong> Before creating a person profile, the system:
+- Searches existing profiles by email
+- If found, updates <code>last_interaction</code> and <code>interaction_count</code>
+- Only creates new profile if truly new contact</p><p><hr></p><p><h2>Meeting Capture Workflow</h2></p><p><h3>What Gets Captured</h3></p><p>For each meeting, the system creates a file like:</p><p><pre><code>~/Documents/WorkMemory/meetings/2026-01/2026-01-29-commonroom-demo.md
+</code></pre></p><p><h3>Meeting File Format</h3></p><p><pre><code>---
+title: CommonRoom Demo
+date: 2026-01-29
+duration_minutes: 24
+source: granola
+granola_doc_id: 37cd8276-...
+was_split: true
+attendees:
+  - email: collin@commonroom.io
+    name: Collin
+  - email: kevin@commonroom.io
+    name: Kevin
+topics:
+  - CommonRoom
+  - B2C marketing
+outcome: not_a_fit
+<hr></p><p><h1>CommonRoom Demo</h1></p><p><h2>Summary</h2></p><p>Exploratory meeting to evaluate if CommonRoom could help
+Guild's B2C marketing team...</p><p><h2>Key Points</h2></p><p>- CommonRoom is tailored for B2B SaaS
+- Not a fit for Guild's B2C use case
+- Potential future use case for B2C-to-B motion</p><p><h2>Action Items</h2></p><p>- [ ] Keep CommonRoom contact for future use case
+- [ ] Continue supporting B2B team's usage</p><p><h2>Transcript Preview</h2></p><p>[CALL]: Recording.
+[CALL]: Hey everyone, welcome to the demo...
+[YOU]: Thanks for having us...
+</code></pre></p><p><hr></p><p><h2>People Profiles</h2></p><p><h3>Internal vs External</h3></p><p>The system separates contacts into two categories:</p><p><strong>Internal</strong> (<code>people/internal/</code>)
+- Guild colleagues (@guild.com)
+- Focus on: team, role, working relationship</p><p><strong>External</strong> (<code>people/external/</code>)
+- Outside contacts (vendors, partners, etc.)
+- Focus on: company, relationship context</p><p><h3>Profile Structure</h3></p><p><pre><code>people/internal/claire-morrison/
+├── profile.md           # Basic info
+└── interactions/
+    └── 2026-01.md       # January interactions
+</code></pre></p><p><h3>Sample Internal Profile</h3></p><p><pre><code>---
+name: Claire Morrison
+canonical_name: claire-morrison
+email: claire.morrison@guild.com
+type: internal
+company: Guild
+team:
+role:
+first_interaction: 2026-01-29
+last_interaction: 2026-01-29
+interaction_count: 2
+<hr></p><p><h1>Claire Morrison</h1></p><p><h2>Role at Guild</h2></p><p>- Email: claire.morrison@guild.com
+- Team: <em>[To be filled in]</em>
+- Role: <em>[To be filled in]</em></p><p><h2>Working Relationship</h2></p><p><em>[Notes about how you work together]</em>
+</code></pre></p><p><h3>Sample Interaction Log</h3></p><p><pre><code><h1>Interactions - 2026-01</h1></p><p><h2>2026-01-29 - Tony / Claire 1:1</h2></p><p><strong>Type:</strong> Meeting
+<strong>Duration:</strong> 29.5 minutes</p><p><em>[See meeting log for details]</em></p><p><hr></p><p><h2>2026-01-29 - Composio Demo</h2></p><p><strong>Type:</strong> Meeting
+<strong>Duration:</strong> 21.7 minutes</p><p><em>[See meeting log for details]</em></p><p><hr>
+</code></pre></p><p><hr></p><p><h2>Commands Reference</h2></p><p><h3>Available Commands</h3></p><p><table>
+<tr><th>Command</th><th>Description</th></tr>
+</table>
+| <code>/mem-sync-meetings</code> | Manually sync Granola meetings |
+| <code>/mem-meetings</code> | Show today's meetings with status |
+| <code>/mem-list</code> | List all people, projects, teams |
+| <code>/mem-view</code> | View a specific profile |
+| <code>/mem-search</code> | Search across all memory |
+| <code>/mem-stats</code> | Show memory statistics |
+| <code>/mem-browse</code> | Open memory folder in Finder |
+| <code>/mem-recent</code> | Show recent activity |
+| <code>/mem-delete</code> | Delete all memory (with confirmation) |</p><p><h3>Natural Language Queries</h3></p><p>You can also just ask Claude:</p><p>- "What do I know about Claire?"
+- "When did I last meet with the Composio team?"
+- "Give me my morning briefing"
+- "Log my conversation with Sarah about Q1 roadmap"
+- "Create a profile for Jane in Product"</p><p><hr></p><p><h2>Technical Details</h2></p><p><h3>Scripts</h3></p><p><table>
+<tr><th>Script</th><th>Purpose</th></tr>
+</table>
+| <code>watch-granola.py</code> | File watcher service |
+| <code>process-granola-meetings.py</code> | Handles Granola quirks |
+| <code>log-meeting-to-memory.py</code> | Creates memory files |
+| <code>smart-meeting-sync.py</code> | Calendar-aware sync (alternative) |</p><p><h3>Data Sources</h3></p><p><strong>Granola Cache:</strong> <code>~/Library/Application Support/Granola/cache-v3.json</code></p><p>Contains:
+- <code>documents{}</code> - Meeting metadata
+- <code>transcripts{}</code> - Full transcript segments
+- <code>meetingsMetadata{}</code> - Calendar integration data</p><p><h3>LaunchAgent</h3></p><p>Location: <code>~/Library/LaunchAgents/com.workmemory.granola-sync.plist</code></p><p>Configuration:
+- Runs <code>watch-granola.py</code> continuously
+- Auto-starts on login (<code>KeepAlive: true</code>)
+- Logs to <code>~/Documents/WorkMemory/logs/</code></p><p><hr></p><p><h2>Troubleshooting</h2></p><p><h3>Meetings Not Syncing</h3></p><p>1. Check if watcher is running:
+   <pre><code>   launchctl list | grep granola
+   </code></pre></p><p>2. Check watcher logs:
+   <pre><code>   tail -f ~/Documents/WorkMemory/logs/granola-watcher.log
+   </code></pre></p><p>3. Manually sync:
+   <pre><code>   python3 ~/.claude/skills/memory-management/scripts/log-meeting-to-memory.py --date 2026-01-29
+   </code></pre></p><p><h3>Duplicate Profiles</h3></p><p>The system deduplicates by email. If you see duplicates:
+1. Check if they have different email addresses
+2. Manually merge by deleting one folder</p><p><h3>Split Meeting Not Merged</h3></p><p>The system only merges if:
+- Gap between meetings < 2 minutes
+- Second meeting has no calendar event</p><p>Check the <code>was_split</code> field in meeting files.</p><p><h3>Watcher Not Starting</h3></p><p><pre><code><h1>Check for errors</h1>
+cat ~/Documents/WorkMemory/logs/granola-watcher-error.log</p><p><h1>Reload LaunchAgent</h1>
+launchctl unload ~/Library/LaunchAgents/com.workmemory.granola-sync.plist
+launchctl load ~/Library/LaunchAgents/com.workmemory.granola-sync.plist
+</code></pre></p><p><hr></p><p><h2>Summary</h2></p><p>Work Memory transforms your meeting notes from scattered chaos into an organized knowledge graph. With automatic Granola integration, you'll never lose track of who you met with or what you discussed.</p><p><strong>Key takeaways:</strong></p><p>1. Meetings are captured automatically
+2. People profiles build over time
+3. Everything is searchable via grep/Claude
+4. All data stays local and private</p><p><strong>Get started:</strong> Just have meetings! The system will capture them automatically.</p><p><strong>Questions?</strong> Ask Claude: "Help me with work memory"</p><p><hr></p><p><em>Built with Claude Code for Guild</em>
+</p>
+</div>
+</body>
+</html>
